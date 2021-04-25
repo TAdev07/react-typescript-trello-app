@@ -5,12 +5,12 @@ const {HotModuleReplacementPlugin} = require('webpack');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
 module.exports = {
-    mode: 'development',
+    mode: 'production',
     entry: path.resolve(__dirname, 'src/index.tsx'),
     output: {
         path: path.resolve(__dirname, 'docs'),
         filename: 'bundle.[contenthash].js',
-        publicPath: '/'
+        publicPath: '/react-typescript-trello-app/'
     },
     resolve: {
         extensions: ['.js', '.json', '.jsx', '.ts', '.tsx'],
@@ -88,6 +88,33 @@ module.exports = {
             }
         ]
     },
+    optimization: {
+        minimize: true,
+        splitChunks: {
+            cacheGroups: {
+                default: false,
+                vendors: false,
+                // Vendor chunk
+                vendor: {
+                    // Name of the chunk
+                    name: 'vendor',
+                    // Async + async chunks
+                    chunks: 'all',
+                    // Import file path containing node_modules
+                    test: /node_modules/,
+                    priority: 20
+                },
+                common: {
+                    name: 'common',
+                    minChunks: 2,
+                    chunks: 'all',
+                    priority: 10,
+                    reuseExistingChunk: true,
+                    enforce: true
+                }
+            }
+        }
+    },
     plugins: [
         // Allows remove/clean the build folder
         new CleanWebpackPlugin(),
@@ -101,12 +128,5 @@ module.exports = {
         new MiniCssExtractPlugin({
             filename: 'styles.[contentHash].css'
         })
-    ],
-    // Config for webpack-dev-server module
-    devServer: {
-        historyApiFallback: true,
-        contentBase: path.resolve(__dirname, 'dist'),
-        hot: true,
-        port: 8000
-    }
+    ]
 };
